@@ -2,4 +2,4 @@
 
 Screenshot
 
-![Screenshot](https://github.com/azbyn/winapi-chess/Screenshot.png "Screenshot")
+![Screenshot](https://github.com/azbyn/winapi-chess/blob/master/Screenshot.png "Screenshot")
