@@ -1,0 +1,7 @@
+-Wall
+-Wextra
+-target
+x86_64-w64-windows-gnu
+-Wno-unused-variable
+-std=c++17
+-DUNICODE
