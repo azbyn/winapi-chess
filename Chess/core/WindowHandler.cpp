@@ -1,12 +1,12 @@
 #include "WindowHandler.h"
 
 #include "Scene.h"
+#include "../Sprites.h"
 
 #include <windowsx.h>
 
 namespace core {
 WindowHandler* WindowHandler::theInstance = nullptr;
-
 
 int WindowHandler::run(Point size, const char* title,
                        Scene& initialScene, int nCmdShow) {
@@ -17,12 +17,10 @@ int WindowHandler::run(Point size, const char* title,
     ::ShowWindow(hwnd, nCmdShow);
 
     MSG msg;
-    // int i = 0;
     while (::GetMessage(&msg, hwnd, 0, 0)) {
         if (wh.hasQuit) return 0;
         ::TranslateMessage(&msg);
         ::DispatchMessage(&msg);
-        // std::cout << "upd8 " << i++ << "\n";
     }
     return (int) msg.wParam;
 }
@@ -39,8 +37,6 @@ WindowHandler::WindowHandler(const char* title, Scene& scene,
     theInstance = this;
     scene.onStart();
     updateSize();
-
-    //::GdiFlush();
 }
 
 void modifyStyle(HWND hwnd, DWORD dwStyle, Rect rect,
@@ -237,6 +233,64 @@ LRESULT CALLBACK WindowHandler::eventHandler(HWND hWnd, UINT uMsg,
     return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
+template<size_t Width, size_t Height, const char CP[], size_t PSize>
+HICON createIcon(const PaletteSprite<Width, Height, CP>& sprite,
+                 const Palette<PSize>& palette) {
+    // typedef struct _ICONINFO {
+    //     BOOL    fIcon;
+    //     DWORD   xHotspot;
+    //     DWORD   yHotspot;
+    //     HBITMAP hbmMask;
+    //     HBITMAP hbmColor;
+    // } ICONINFO;
+    ICONINFO info;
+    info.fIcon = true;//we don't want a cursor
+    // constexpr size_t n = Width * Height;
+    std::array<uint32_t, Width* Height> data;
+
+    constexpr auto toInt = [](Color c) {
+        return c.a() << 24 | c.r() << 16 | c.r() << 8 | c.b();
+    };
+
+    int z = 0;
+    for (size_t j = 0; j < Height; ++j) {
+        for (size_t i = 0; i < Width; ++i) {
+            data[z++] = toInt(palette[sprite(i, j)]);
+        }
+    }
+    struct RaiiBitmap {
+        HBITMAP val;
+        RaiiBitmap(int width, int height,
+                   UINT planes,
+                   UINT bitCount,
+                   const void* data) {
+            val = ::CreateBitmap(width, height, planes, bitCount, data);
+            if (!val)
+                throw WinapiError("CreateBitmap");
+        }
+        operator HBITMAP() const { return val; }
+        ~RaiiBitmap() {
+            //should be fine without the throw
+            ::DeleteObject(val);
+            // if (!::DeleteObject(val))
+            //     throw WinapiError("DeleteObject");
+        }
+    };
+
+    RaiiBitmap col  = RaiiBitmap(Width, Height, 1, 32, data.data());
+    RaiiBitmap mask = RaiiBitmap(Width, Height, 1, 1, nullptr);
+
+    // we can't inline those because it'll get destroyed imediately
+    // (ie info.hbmColor = RaiiBitmap(...))
+    info.hbmColor = col;
+    info.hbmMask = mask;
+    HICON res = ::CreateIconIndirect(&info);
+    if (res == nullptr)
+        throw WinapiError("CreateIconIndirect");
+
+    return res;
+}
+
 HWND WindowHandler::createWindow(const char* title, Rect r,
                                  BYTE type, DWORD flags) {
     HINSTANCE hInstance = ::GetModuleHandle(nullptr);
@@ -249,7 +303,8 @@ HWND WindowHandler::createWindow(const char* title, Rect r,
     wc.cbClsExtra    = 0;
     wc.cbWndExtra    = 0;
     wc.hInstance     = hInstance;
-    wc.hIcon         = ::LoadIcon(nullptr, IDI_APPLICATION);
+    wc.hIcon         = createIcon(sprites::Pawn, sprites::BlackPalette);
+    //::LoadIcon(nullptr, IDI_APPLICATION);
     wc.hCursor       = ::LoadCursor(nullptr, IDC_ARROW);
     wc.hbrBackground = nullptr;
     wc.lpszMenuName  = nullptr;
@@ -260,7 +315,7 @@ HWND WindowHandler::createWindow(const char* title, Rect r,
     }
 
     DWORD dwStyle = ResizeableStyle;
-    Rect adjustedR = r;// (0, 0, width, height);
+    Rect adjustedR = r;
     adjustedR.adjustWindowRect(dwStyle, false);
     r.x1() = r.x0() + adjustedR.width();
     r.y1() = r.y0() + adjustedR.height();
@@ -277,7 +332,7 @@ HWND WindowHandler::createWindow(const char* title, Rect r,
 
     pfd.nSize        = sizeof(pfd);
     pfd.nVersion     = 1;
-    pfd.dwFlags      = PFD_DRAW_TO_WINDOW /*| PFD_SUPPORT_OPENGL*/ | flags;
+    pfd.dwFlags      = PFD_DRAW_TO_WINDOW | flags;
     pfd.iPixelType   = type;
     pfd.cColorBits   = 32;
     int pf = ::ChoosePixelFormat(dc, &pfd);

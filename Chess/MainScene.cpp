@@ -70,6 +70,7 @@ void MainScene::newGameImpl(chess::Side side) {
     pieceMovingData.reset();
     board.reset();
     bot.reset();
+    validMoves.clear();
     SceneManager::load(*this);
     if (side != chess::Side::White)
         bot.onPlayerMove(board.getState());

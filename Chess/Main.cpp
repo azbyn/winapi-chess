@@ -1,4 +1,3 @@
-// #include "MainScene.h"
 #include "MainMenuScene.h"
 
 #include <signal.h>
@@ -9,7 +8,6 @@
   move log?
 
   animation for castling
-  icon
 
   nicely format everything
  */
@@ -33,7 +31,6 @@ int APIENTRY WinMain(HINSTANCE /*hCurrentInst*/, HINSTANCE /*hPreviousInst*/,
         std::cerr << e.what();
         return -1;
     }
-    // int nCmdShow = SW_SHOWDEFAULT);
 }
 
 #ifndef _MSC_VER

@@ -16,8 +16,6 @@ public:
     //must be called by subclass
     void onDraw(core::Paint& paint) override;
 
-    // constexpr chess::Side getPlayerSide() { return playerSide; }
-
 protected:
     virtual const chess::Board& getBoard() const = 0;
     virtual const std::string& getPlayerName(chess::Side) const = 0;

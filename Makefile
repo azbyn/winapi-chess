@@ -46,7 +46,6 @@ compile: clean $(OBJS)
 $(TARGET): $(OBJS)
 	$(LD) -o $@ $(OBJS) $(LDFLAGS)
 
-
 #$(BUILD_DIR)/%.cpp.o: %.cpp ${INCL}
 
 $(BUILD_DIR)/%.cpp.o: %.cpp
@@ -55,8 +54,9 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 
 
 .PHONY: clean
+#don't clean stockfish, it's large and i'm not gonna change that
 clean:
-	@$(RM) $(BUILD_DIR)/*.o $(BUILD_DIR)/chess/*.o $(BUILD_DIR)/core/*.o $(TARGET)
+	@$(RM) $(BUILD_DIR)/Chess/*.o $(BUILD_DIR)/Chess/chess/*.o $(BUILD_DIR)/Chess/core/*.o $(TARGET)
 
 #-include $(DEPS)
 

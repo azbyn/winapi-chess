@@ -37,6 +37,8 @@ chess::Pos BoardDrawingScene::screenToBoardPos(core::Point pt) const {
     auto pos = (pt - boardStart()) / SquareLength;
     if (getPlayerSide() == chess::Side::White)
         pos.y = 7 - pos.y;
+    pos.x = core::clamp(pos.x, 0, 7);
+    pos.y = core::clamp(pos.y, 0, 7);
     return chess::Pos(pos);
 }
 
