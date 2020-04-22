@@ -73,6 +73,7 @@ protected:
         void setMousePos(core::Point p, chess::Pos boardPos);
         // Returns true if should redraw
         bool onMouseMove(core::Point p);
+        void onLeftMouseUp();
 
         void stop();
 

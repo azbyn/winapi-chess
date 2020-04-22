@@ -158,7 +158,7 @@ void MainScene::onLeftMouseUp(Point pt) {
             deselect();
         }
 
-        pieceMovingData.stop();
+        pieceMovingData.onLeftMouseUp();
         redraw();
     }
 }

@@ -232,6 +232,12 @@ bool BoardDrawingScene::PieceMovingData::onMouseMove(Point p) {
     }
     return val;
 }
+void BoardDrawingScene::PieceMovingData::onLeftMouseUp() {
+    if (state == State::MouseMoving) {
+        state = State::NotMoving;
+        piecePos = chess::Pos::Invalid;
+    }
+}
 void BoardDrawingScene::PieceMovingData::stop() {
     state = State::NotMoving;
     piecePos = chess::Pos::Invalid;

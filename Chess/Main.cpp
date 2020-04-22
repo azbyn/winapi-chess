@@ -2,16 +2,6 @@
 
 #include <signal.h>
 
-/*
-  todo:
-
-  move log?
-  release
-
-  animation for castling
-
-  nicely format everything
- */
 using namespace core;
 void signalHandler(int signal) {
     std::cerr << "Signal " << signal << "\n";
