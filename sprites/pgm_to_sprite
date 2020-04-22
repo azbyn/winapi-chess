@@ -18,7 +18,7 @@ if len(sys.argv) < 2:
     print("please enter file name")
     exit(1)
 name = sys.argv[1][:-4].capitalize()
-res = "constexpr PaletteSprite<32, 32, CharPalette> "+name+" {\n"
+res = "constexpr core::ConstPaletteSprite<32, 32, CharPalette> "+name+" {\n"
 res += '    "'
 i = 0
 
@@ -44,4 +44,3 @@ res = res[:-5] + "};"
 print(res)
 # print("nl", newlines)
 # print("str", str[:-2])
-# print("end")

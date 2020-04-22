@@ -2,4 +2,5 @@ build
 *.obj
 .vs
 Debug
+Release
 *.user
