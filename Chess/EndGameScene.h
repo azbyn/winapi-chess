@@ -33,38 +33,22 @@ public:
     void onButtonSelected(int i) override;
     void onMouseMove(core::Point pos) override;
 
-    //TODO onleftmousemove
-
-    //board drawing scene
+    // BoardDrawingScene
     const chess::Board& getBoard() const override;
     const std::string& getPlayerName(chess::Side) const override;
     chess::Side getPlayerSide() const override;
-    // void drawMouse(core::Paint& p, const core::Rect& r) override;
-    // void drawKeyboard(core::Paint& p, const core::Rect& r) override;
 
 private:
     enum class State {
         ShowingPieceMoving,
-        // SavingBackground,
         ShowingAnimation,
         FinishedAnimation,
         ViewingBoard,
     };
-    friend std::ostream& operator << (std::ostream& s, State state) {
-        switch (state) {
-        case State::ShowingPieceMoving: return s <<"ShowingPieceMoving";
-        // case State::SavingBg:           return s <<"SavingBackgound";
-        case State::ShowingAnimation:   return s <<"ShowingAnimation";
-        case State::FinishedAnimation:  return s <<"FinishedAnimation";
-        case State::ViewingBoard:       return s <<"ViewingBoard";
-        }
-        return s << "?";
-    }
     EndGameScene();
 
     std::string title, subtitle;
     std::chrono::time_point<std::chrono::system_clock> t0;
-    // bool isFinished;
     State state;
 
     core::RectGroup rects;
@@ -73,7 +57,8 @@ private:
     void loadImpl(chess::FullMove move,
                   std::string_view title,
                   const std::string& subtitle);
-    // called from onLeftMouseDown and onKeyDown
+
+    // Called from onLeftMouseDown and onKeyDown
     // if state == ViewingBoard then we resume
     // returns true if we should pass the input to MenuScene
     bool checkUserInput();

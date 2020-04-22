@@ -59,9 +59,9 @@ constexpr DWORD StaticStyle =
     WS_SYSMENU | WS_MINIMIZEBOX;
 
 void WindowHandler::setWindowMode(WindowMode val) {
-    std::cout << "SetWindowMode" << (int)val << " - "<<(int)windowMode << "\n";
     if (val == windowMode) return;
     Rect rect = background.size().asRect();
+
     switch (val) {
     case WindowMode::Resizeable:
         rect.adjustWindowRect(ResizeableStyle, false);
@@ -74,8 +74,6 @@ void WindowHandler::setWindowMode(WindowMode val) {
     windowMode = val;
     stretchData.setShouldStretch(windowMode != WindowMode::Static);
     stretchData.updateSize(getSize());
-    // DEVMODEA lpDevMode;
-    // changeDisplaySettingsA();
 }
 
 WindowHandler::~WindowHandler() noexcept {
@@ -92,7 +90,6 @@ void WindowHandler::setSnapshot(const std::vector<uint8_t>& snap) {
 }
 
 void WindowHandler::updateSize() {
-    // currentScene->onSizeChanged(getSize());
     currentScene->onSizeChanged(background.size());
     redrawBackground();
 }
@@ -112,17 +109,15 @@ Point WindowHandler::getSize() const {
 }
 void WindowHandler::setSize(Point val) {
     auto r = Rect::getClientRect(hwnd);
-    //repaint = false because we want to do things in order;
+    //repaint = false because we want to do things in our order
     if (!::MoveWindow(hwnd, r.x0(), r.y0(), val.x, val.y, false)) {
         throw WinapiError("MoveWindow");
     }
-    // redrawBackground();
     updateSize();
     redraw();
 }
 
 void WindowHandler::quit() {
-    std::cout << "WindowHandler::quit\n";
     hasQuit = true;
     ::PostQuitMessage(0);
 }
@@ -135,18 +130,13 @@ void WindowHandler::redrawBackground() {
     redraw();
 }
 
-// void WindowHandler::copyToBackground(Scene& s) {
-//     s.onDraw(background);
-// }
 void WindowHandler::changeScene(Scene& s) {
     currentScene->onDraw(background);
-    /*if (scene) */
     currentScene->onStop();
     currentScene = &s;
     currentScene->onStart();
     updateSize();
     redraw();
-    // scene->onDraw(foreground);
 }
 
 Point WindowHandler::getMousePos(LPARAM lParam) {
@@ -157,7 +147,6 @@ Point WindowHandler::getMousePos(LPARAM lParam) {
 
 LRESULT CALLBACK WindowHandler::eventHandler(HWND hWnd, UINT uMsg,
                                              WPARAM wParam, LPARAM lParam) {
-    //std::cout << "tick "<< ++i <<"\n";
     PAINTSTRUCT ps;
     switch(uMsg) {
     case WM_PAINT: {
@@ -172,12 +161,9 @@ LRESULT CALLBACK WindowHandler::eventHandler(HWND hWnd, UINT uMsg,
         return 0;
     }
     case WM_SIZE: {
-        if (lParam == 0) {
-            std::cout << "minimized\n";
-        } else {
-            // std::cout << "WM_SIZE\n";
+        // We're not minimized
+        if (lParam != 0) {
             instance().stretchData.updateSize({LOWORD(lParam), HIWORD(lParam)});
-            // instance().updateSize();
             instance().redraw();
         }
         return 0;
@@ -203,49 +189,19 @@ LRESULT CALLBACK WindowHandler::eventHandler(HWND hWnd, UINT uMsg,
     case WM_RBUTTONUP:
         scene().onRightMouseUp(instance().getMousePos(lParam));
         return 0;
-        // case WM_CHAR:
-        //     switch (wParam) {
-        //     case 27: /* ESC key */
-        //         PostQuitMessage(0);
-        //         break;
-        //     }
-        //     return 0;
     case WM_CLOSE:
-        std::cout << "CLOSE\n";
         instance().hasQuit = true;
         ::PostQuitMessage(0);
         return 0;
-    case WM_QUIT:
-        std::cout << "QUIT\n";
-        break;
-        // return 0;
-    // case WM_CHAR:
-    // case WM_SETCURSOR:
-    // case WM_NCMOUSELEAVE:
-    // case WM_NCHITTEST:
-    //     break;
-
-    default:
-        // if (hasQuit)
-        //     std::cout << "msg: 0x" << std::hex << uMsg << "\n";
-        break;
     }
     return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-template<size_t Width, size_t Height, const char CP[], size_t PSize>
-HICON createIcon(const PaletteSprite<Width, Height, CP>& sprite,
-                 const Palette<PSize>& palette) {
-    // typedef struct _ICONINFO {
-    //     BOOL    fIcon;
-    //     DWORD   xHotspot;
-    //     DWORD   yHotspot;
-    //     HBITMAP hbmMask;
-    //     HBITMAP hbmColor;
-    // } ICONINFO;
+template<size_t Width, size_t Height, const char CP[]>
+HICON createIcon(const ConstPaletteSprite<Width, Height, CP>& sprite,
+                 const ConstPalette<CP>& palette) {
     ICONINFO info;
-    info.fIcon = true;//we don't want a cursor
-    // constexpr size_t n = Width * Height;
+    info.fIcon = true; //We don't want a cursor
     std::array<uint32_t, Width* Height> data;
 
     constexpr auto toInt = [](Color c) {
@@ -255,7 +211,7 @@ HICON createIcon(const PaletteSprite<Width, Height, CP>& sprite,
     int z = 0;
     for (size_t j = 0; j < Height; ++j) {
         for (size_t i = 0; i < Width; ++i) {
-            data[z++] = toInt(palette[sprite(i, j)]);
+            data[z++] = toInt(palette[sprite.at(i, j)]);
         }
     }
     struct RaiiBitmap {
@@ -270,17 +226,15 @@ HICON createIcon(const PaletteSprite<Width, Height, CP>& sprite,
         }
         operator HBITMAP() const { return val; }
         ~RaiiBitmap() {
-            //should be fine without the throw
+            //should be fine without check for failure
             ::DeleteObject(val);
-            // if (!::DeleteObject(val))
-            //     throw WinapiError("DeleteObject");
         }
     };
 
     RaiiBitmap col  = RaiiBitmap(Width, Height, 1, 32, data.data());
     RaiiBitmap mask = RaiiBitmap(Width, Height, 1, 1, nullptr);
 
-    // we can't inline those because it'll get destroyed imediately
+    // We can't inline those because it'll get destroyed imediately
     // (ie info.hbmColor = RaiiBitmap(...))
     info.hbmColor = col;
     info.hbmMask = mask;
@@ -298,19 +252,26 @@ HWND WindowHandler::createWindow(const char* title, Rect r,
         throw WinapiError("GetModuleHandle()");
     WNDCLASSW wc;
 
+    // Making this with more colors looks bad
+    ConstPalette<sprites::CharPalette> iconPalette = {
+        core::Color::Clear,
+        core::Color::Black,
+        core::Color::Black,
+        core::Color::Black,
+    };
+
     wc.style         = CS_OWNDC;
     wc.lpfnWndProc   = eventHandler;
     wc.cbClsExtra    = 0;
     wc.cbWndExtra    = 0;
     wc.hInstance     = hInstance;
-    wc.hIcon         = createIcon(sprites::Pawn, sprites::BlackPalette);
-    //::LoadIcon(nullptr, IDI_APPLICATION);
+    wc.hIcon         = createIcon(sprites::Pawn, iconPalette);
     wc.hCursor       = ::LoadCursor(nullptr, IDC_ARROW);
     wc.hbrBackground = nullptr;
     wc.lpszMenuName  = nullptr;
     wc.lpszClassName = L"Pixels";
 
-    if (!RegisterClassW(&wc)) {
+    if (!::RegisterClassW(&wc)) {
         throw WinapiError("RegisterClassW");
     }
 

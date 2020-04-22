@@ -76,7 +76,6 @@ void OptionsScene::onButtonSelected(int index) {
         break;
     case Button::Difficulty:
     case Button::SfxVolume:
-        // MenuScene::onButtonSelected(index);
         break;
     case Button::SfxOn:
         SoundManager::toggleSfxOn();
@@ -88,7 +87,6 @@ void OptionsScene::onButtonSelected(int index) {
         break;
     case Button::IsResizeable: {
         auto& wh = WindowHandler::instance();
-        std::cout << "resizeable click " << (int)wh.getWindowMode()<< "\n";
         if (wh.getWindowMode() == WindowMode::Static) {
             wh.setWindowMode(WindowMode::Resizeable);
         } else {

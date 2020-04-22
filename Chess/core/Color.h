@@ -7,7 +7,7 @@
 
 namespace core {
 
-//because of the constexpr this everything must be defined in the header file
+// Because of the constexpr this everything must be defined in the header file
 class Color {
     uint8_t alpha, red, green, blue;
 public:
@@ -16,6 +16,7 @@ public:
     constexpr uint8_t b() const { return blue; }
     constexpr uint8_t a() const { return alpha; }
 
+    constexpr Color() : Color(0,0,0,0) {}
     constexpr Color(uint32_t val)
         : Color(uint8_t(val >> 24), uint8_t(val >> 16),
                 uint8_t(val >> 8), uint8_t(val)) {
@@ -41,7 +42,7 @@ public:
         return res / 255;
     }
     // lerp = Linear intERPolation
-    // like lerp, but with values of t between 0 and 255, not 0 to 1
+    // like the regular lerp, but with values of t between 0 and 255, not 0 to 1
     static constexpr Color lerp8(Color a, Color b, uint8_t t) {
         return Color(
             lerp8(a.r(), b.r(), t),
@@ -56,13 +57,11 @@ public:
         Clear, Blurry;
 
     friend std::ostream& operator<<(std::ostream& s, Color c) {
-        // std::ios_base::fmtflags f(s.flags());
         s << "#"
           << std::hex << std::setfill('0') << std::setw(2) << (int)c.a()
           << std::hex << std::setfill('0') << std::setw(2) << (int)c.r()
           << std::hex << std::setfill('0') << std::setw(2) << (int)c.g()
           << std::hex << std::setfill('0') << std::setw(2) << (int)c.b();
-        // s.flags(f);
         return s;
     }
 };

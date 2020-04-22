@@ -182,9 +182,6 @@
     <ClInclude Include="core\RectGroup.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="core\Sprite.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
     <ClInclude Include="chess\Piece.h">
       <Filter>Header Files\chess</Filter>
     </ClInclude>
@@ -280,6 +277,12 @@
     </ClInclude>
     <ClInclude Include="BoardDrawingScene.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ConstPaletteSprite.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\PaletteSprite.h">
+      <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

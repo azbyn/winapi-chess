@@ -91,7 +91,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -115,9 +115,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -188,10 +189,11 @@
     <ClInclude Include="chess\Piece.h" />
     <ClInclude Include="core\ButtonSelectorScene.h" />
     <ClInclude Include="core\Color.h" />
+    <ClInclude Include="core\ConstPaletteSprite.h" />
     <ClInclude Include="core\Paint.h" />
+    <ClInclude Include="core\PaletteSprite.h" />
     <ClInclude Include="core\RectGroup.h" />
     <ClInclude Include="core\Scene.h" />
-    <ClInclude Include="core\Sprite.h" />
     <ClInclude Include="core\Utils.h" />
     <ClInclude Include="core\WaveSound.h" />
     <ClInclude Include="core\WindowHandler.h" />

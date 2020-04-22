@@ -16,8 +16,6 @@ public:
     void onDraw(core::Paint& p) override;
     void onDrawBackground(core::Paint& p) override;
 
-    void onKeyDown(char k) override;
-
     void onButtonSelected(int i) override;
 
     void drawMouse(core::Paint& p, const core::Rect& r) override;

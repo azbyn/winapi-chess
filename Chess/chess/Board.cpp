@@ -2,7 +2,6 @@
 
 #include "Piece.h"
 
-
 namespace chess {
 template <class T>
 void addBoth(Board* p, int x) {
@@ -31,10 +30,6 @@ void Board::reset() {
 
     addBoth<Queen>(this, 3);
     addBoth<King>(this, 4);
-    // at(4, 7) = std::make_unique<King>(Side::Black);
-    // at(0, 7) = std::make_unique<Rook>(Side::Black);
-    // for (int i = 0; i < 4; ++i)
-    //     at(i, 6) = std::make_unique<Pawn>(Side::Black);
 
     state.update(pieces);
 }
@@ -67,16 +62,14 @@ void Board::finishMove(FullMove move) {
             break;
         }
     }
-    std::cout << state << "\n";
+    std::clog << state << "\n";
+
     // 50 half moves = 100 moves
     if (state.halfMoveClock >= 100)
         drawCallback(move, "Fifty-move rule");
-
-    // auto shortenedFEN = state.getShortenedFEN();
     
     auto count = ++boardHistory[state.getShortenedFEN()];
 
-    std::cout << "count: "<< count<< "\n";
     if (count == 3) {
         drawCallback(move, "Threefold repetition");
     }
@@ -94,8 +87,8 @@ void Board::eatAt(Pos p) {
 }
 
 void Board::onGetPromotionResult(Side side, PromotionResult res) {
-    std::cout << "onGetPromotionResult( "<< side
-              << " vs " << getCurrentSide() << "\n";
+    using core::concat;
+
     auto& to = at(promotionMove.to);
     switch (res) {
     case PromotionResult::Knight: to = std::make_unique<Knight>(side); break;
@@ -103,39 +96,22 @@ void Board::onGetPromotionResult(Side side, PromotionResult res) {
     case PromotionResult::Rook:   to = std::make_unique<Rook>(side); break;
     case PromotionResult::Queen:  to = std::make_unique<Queen>(side); break;
     default:
-        std::cerr << "PromotionResult = " << (int) res << "\n";
-        throw std::logic_error("invalid promotionResult");
+        throw std::logic_error(concat("invalid promotionResult ", (int)res));
     }
-    // previouslyMovedPiece = at(promotionMove.to).get();
     promotionMove.promotionResult = res;
-    //TODO DOES THIS STILL WORK?
     finishMove(promotionMove);
     if (moveExecutedCallback) {
         moveExecutedCallback(promotionMove);
     }
-    
-    // promotionMove.to = {-1, -1};
 }
 void Board::moveUnchecked(Pos from, Pos to) {
-    // we don't need to check for null, dynamic_cast already does that
-    // if (auto* pawn = dynamic_cast<Pawn*>(previouslyMovedPiece)) {
-    //     // std::clog << "previous was pawn\n";
-    //     pawn->setCanBeEnPassanted(false);
-    // }
-
     eatAt(to);
     at(to) = std::exchange(at(from), nullptr);
     at(to)->onMoved();
-
-    // if (auto* king = dynamic_cast<King*>(at(to).get())) {
-    //     kingPos[king->getSide()] = to;
-    // }
-    // previouslyMovedPiece = at(to).get();
 }
 void doNothingPC(Side) {}
 
 void Board::doFullMove(FullMove move) {
-    std::cout << "dfm" << move << "\n";
     auto pc = promotionCallback;
     promotionCallback = doNothingPC;
 
@@ -159,7 +135,7 @@ void Board::doFullMove(FullMove move) {
       };
 
     if (!tryMove(move.from, move.to, nullptr)) {
-        std::cout << "fen " << state << "\n";
+        std::clog << "fen " << state << "\n";
         std::cerr <<("Can't do that?! Doing first valid move.\n");
         doFirstValid();
     }
@@ -171,16 +147,9 @@ void Board::doFullMove(FullMove move) {
 }
 
 bool Board::tryMove(Pos from, Pos to, MoveExecutedCallback callback) {
-    std::cout << "tryMove: "<< from << " to " << to << "\n";
     auto& ptr = at(from);
     if (ptr == nullptr)
         return false;
-
-    if (dynamic_cast<const King*>(ptr.get())) {
-        if (ptr->getSide() == Side::Black) {
-            std::cout << "KING first: " << ptr->getMadeFirstMove() << "\n";
-        }
-    }
 
     std::vector<Move> validMoves;
     ptr->getValidMoves(from, state, validMoves);

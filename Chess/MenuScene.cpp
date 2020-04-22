@@ -25,7 +25,7 @@ void MenuScene::onDrawBackground(Paint& p) {
         p.fillRect(r, ButtonCol);
 }
 void MenuScene::onDraw(core::Paint& p) {
-    constexpr auto getPalette = [] (bool isValid) -> const Palette<4>& {
+    constexpr auto getPalette = [] (bool isValid) -> const auto& {
         return isValid ? sprites::ValidBtnPalette : sprites::InvalidBtnPalette;
     };
 
@@ -92,12 +92,11 @@ void MenuScene::onButtonMove(int index, int delta) {
         using T = std::decay_t<decltype(arg)>;
         if constexpr (std::is_same_v<T, ButtonData::LeftRight>) {
             SoundManager::playLeftRightMove();
-            arg.setVal(clamp(arg.getVal()+delta, arg.min, arg.max));
+            arg.setVal(clamp(arg.getVal() + delta, arg.min, arg.max));
         } else if constexpr (std::is_same_v<T, ButtonData::Radio> ||
                              std::is_same_v<T, ButtonData::SpriteRadio>) {
             onButtonSelected(index);
         } else {
-            // ButtonSelectorScene::onButtonMove(index, delta);
             if (getMode() == Mode::Vertical && delta > 0) {
                 onButtonSelected(index);
             } else {
@@ -107,6 +106,32 @@ void MenuScene::onButtonMove(int index, int delta) {
     }, b.data);
 }
 
+
+void MenuScene::drawLeft(core::Paint& p, size_t index,
+                         const core::PaletteSprite& sprite,
+                         const core::Palette& palette) const {
+    drawLeft(p, getButtonRect(index), sprite, palette);
+}
+
+void MenuScene::drawLeft(core::Paint& p, const core::Rect& r,
+                         const core::PaletteSprite& sprite,
+                         const core::Palette& palette) const {
+    p.drawSprite(r.topLeft(), sprite, palette, r.height() / sprite.height());
+}
+
+void MenuScene::drawRight(core::Paint& p, const core::Rect& r,
+                          const core::PaletteSprite& sprite,
+                          const core::Palette& palette) const {
+    p.drawSprite(r.topRight() - core::Point{r.height(), 0},
+                 sprite, palette, r.height() / sprite.height());
+}
+void MenuScene::drawRight(core::Paint& p, size_t index,
+                          const core::PaletteSprite& sprite,
+                          const core::Palette& palette) const {
+    drawRight(p, getButtonRect(index), sprite, palette);
+}
+
+
 void MenuScene::drawMouse(Paint& p, const Rect& rect) {
     p.fillRect(rect, ButtonHighlightCol);
     p.drawRectIn(rect, 3, MarginCol);
@@ -115,5 +140,3 @@ void MenuScene::drawKeyboard(Paint& p, const Rect& rect) {
     p.fillRect(rect, ButtonHighlightCol);
     p.drawRectIn(rect, 3, MarginCol);
 }
-
-

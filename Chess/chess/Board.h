@@ -17,13 +17,11 @@ public:
     using StalemateCallback = void(*)(FullMove, Side whoCantMove);
     using DrawCallback      = void(*)(FullMove, std::string_view why);
     using MoveExecutedCallback = void(*)(FullMove);
-    //using EatenCallback = void (*)(std::unique_ptr<Piece>&&);
 
     Board(PromotionCallback promotionCallback,
           CheckmateCallback checkmateCallback,
           StalemateCallback stalemateCallback,
           DrawCallback      drawCallback);
-
 
     Board(const Board&) = delete;
     Board(Board&&) = delete;
@@ -45,11 +43,11 @@ public:
         return at(p.x(), p.y());
     }
 
-    // returns true if move is valid and executes it
+    // Returns true if move is valid and executes it
     // moveExecutedCallback can be null
     bool tryMove(Pos from, Pos to, MoveExecutedCallback moveExecutedCallback);
 
-    // there's no try, only do
+    // There's no try, only do
     void doFullMove(FullMove move);
 
     constexpr Side getCurrentSide() const { return state.currentSide; }
@@ -57,8 +55,8 @@ public:
     constexpr bool getIsInCheck(Side side) const {
         return state.isInCheck[side];
     }
-    const auto& getState() const { return state; }
 
+    const auto& getState() const { return state; }
     const auto& getMoveHistory() const { return moveHistory; }
 
     constexpr const auto& getEatenPieces(Side side) const {
@@ -69,22 +67,20 @@ private:
     std::array<std::unique_ptr<Piece>, 64> pieces;
     BoardState state;
 
-    //key: board state in FEN
-    //value: how many times it appears
+    // key: board state in FEN
+    // value: how many times it appears
     std::map<std::string, int> boardHistory;
 
 
     SideEntries<std::vector<std::unique_ptr<Piece>>> eatenPieces;
-    // std::vector<std::unique_ptr<Piece>> eatenBlack;
 
     std::vector<FullMove> moveHistory;
 
-    // // for en passant
-    // Piece* previouslyMovedPiece = nullptr;
-
     PromotionCallback promotionCallback;
     FullMove promotionMove;
-    //stored just for promotion
+
+    // Stored just for promotion (the move is executed after we get the
+    // promotion result)
     MoveExecutedCallback moveExecutedCallback;
 
     CheckmateCallback checkmateCallback;

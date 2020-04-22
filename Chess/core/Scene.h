@@ -36,24 +36,22 @@ public:
         WindowHandler::instance().redrawBackground();
     }
 
-    //when this scene gets selected
+    // Called when this scene gets selected
     virtual void onStart() {}
 
-    //when this scene gets deselected or the window is closed
+    // Called when this scene gets deselected or the window is closed
     virtual void onStop() {}
 
     virtual void onDraw(Paint& p) = 0;
     virtual void onDrawBackground(Paint& p) = 0;
 
-    // should return true if the key is captured
-    // only used for comunication between the class and subclass
+    // Should return true if the key is captured
+    // Only used for comunication between the class and subclass
     virtual void onKeyDown(char /*key*/) { }
     virtual void onKeyUp(char /*key*/) { }
 
     virtual void onMouseMove(Point /*pos*/) {}
-    // virtual void onMouseDown(Point /*pos*/, MouseButton /*btn*/) {}
-    // virtual void onMouseUp(Point /*pos*/) {}
-    // virtual void onMouseDoubleClick(Point /*pos*/, MouseButton /*btn*/) {}
+
     virtual void onRightMouseUp(Point /*pos*/) {}
     virtual void onRightMouseDown(Point /*pos*/) {}
     virtual void onLeftMouseUp(Point /*pos*/) {}

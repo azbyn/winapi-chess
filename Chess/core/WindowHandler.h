@@ -50,8 +50,6 @@ public:
     void getSnapshot(std::vector<uint8_t>& snap) const;
     void setSnapshot(const std::vector<uint8_t>& snap);
 
-    // void copyToBackground(Scene& s);
-    // Paint& getBackground() { return background; }
 private:
     void updateSize();
 
@@ -68,7 +66,7 @@ private:
     Scene* currentScene;
     std::string title;
 
-    // glut could save some headaches but I wanted this to work out of the box
+    // Glut could save some headaches but I wanted this to work out of the box
     // in Windows
     HWND hwnd;
     Paint background, foreground;

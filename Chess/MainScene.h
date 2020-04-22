@@ -17,10 +17,6 @@ public:
         instance().newGameImpl(side);
     }
 
-    // void onSizeChanged(core::Point size) override;
-
-    // void onDrawBackground(core::Paint& paint) override;
-    // void onDraw(core::Paint& paint) override;
     void drawBoard(core::Paint& paint) const override;
 
     void onKeyDown(char k) override;
@@ -34,8 +30,6 @@ public:
     static bool getShowingValidMoves();
     static void setShowingValidMoves(bool val);
     static void toggleShowingValidMoves();
-
-    // static void viewBoard();
 
     chess::Board& getBoard() { return board; }
 
@@ -61,12 +55,10 @@ private:
 
     bool showingValidMoves;
 
-    // bool showingBoard;
-
     bool isSelected() const;
     void deselect();
 
-    // fails work if there's no piece at pos or
+    // Fails if there's no piece at pos or
     // if the piece is not the correct side
     bool trySelect(chess::Pos pos);
 

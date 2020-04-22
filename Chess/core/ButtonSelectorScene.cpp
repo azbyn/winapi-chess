@@ -48,14 +48,14 @@ void ButtonSelectorScene::onLeftMouseDown(Point pos) {
 void ButtonSelectorScene::onMouseMove(Point pos) {
     auto delta = (prevMousePos - pos).length2();
     if (delta == 0) return;
-    // std::cout << "BSS::onMouseMove " << pos << " d " << delta << "\n";
+
     prevMousePos = pos;
     if (rects.boundingRect.contains(pos)) {
         int i = 0;
         for (auto& r : rects) {
             if (r.contains(pos)) {
                 setMouseCursor(i);
-                //assume they don't overlap
+                // Assume they don't overlap
                 return;
             }
             ++i;
@@ -64,13 +64,11 @@ void ButtonSelectorScene::onMouseMove(Point pos) {
     setMouseCursor(-1);
 }
 void ButtonSelectorScene::setMouseCursor(int val) {
-    // std::cout << "setMouseCursor " << val << "\n";
     bool prev = usingKeyboard;
     if (prev && val == -1) return;
     usingKeyboard = false;
     if (prev || mouseCursor != val) {
         mouseCursor = val;
-        // std::cout << "mouseCursor = " << mouseCursor << "\n";
         redraw();
     }
 }

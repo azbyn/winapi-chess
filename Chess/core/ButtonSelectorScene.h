@@ -11,18 +11,18 @@ public:
     ButtonSelectorScene(size_t btnCount, Mode mode)
             : rects(btnCount), mode(mode) {}
 
-    //must be called by subclass
+    // Must be called by subclass
     void onStart() override;
 
-    //must be called by subclass
+    // Must be called by subclass
     void onKeyDown(char k) override;
 
-    //must be called by subclass
+    // Must be called by subclass
     void onLeftMouseDown(Point pos) override;
-    //must be called by subclass
+    // Must be called by subclass
     void onMouseMove(Point pos) override;
 
-    //must be called by subclass
+    // Must be called by subclass
     void onDraw(Paint& p) override;
 
     virtual void onButtonSelected(int i) = 0;
@@ -33,18 +33,18 @@ public:
     // if mode == Horizontal, then if we press up arrow
     // we call onButtonMove(-1), for down arrow we call onButtonMove(1).
     //
-    // you don't have to call it from the subclass
+    // You don't have to call it from the subclass.
     virtual void onButtonMove(int i, int delta);
 
-    // should be called by subclass, it's ok to ignore it
-    // called on click
+    // Should be called by subclass, it's ok to ignore it
+    // Called on click
     virtual void onButtonClick(int i, Point mousePos);
 
     virtual void drawMouse(Paint& p, const Rect& r) = 0;
     virtual void drawKeyboard(Paint& p, const Rect& r) = 0;
 
 protected:
-    //getButtonRects().update....() must be called from onSizeChanged
+    // getButtonRects().update....() must be called from onSizeChanged
     RectGroup& getButtonRects() { return rects; }
     const Rect& getButtonRect(size_t i) const { return rects[i]; }
     Rect& getButtonRect(size_t i) { return rects[i]; }

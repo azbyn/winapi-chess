@@ -16,12 +16,9 @@ public:
     void onDrawBackground(core::Paint& p) override;
 
     void onButtonSelected(int i) override;
-    // void onButtonClick(int i, core::Point mousePos) override;
 
-    // void onKeyDown(char k) override;
 private:
     MainMenuScene();
-    void startGame();
 
     core::RectGroup rects;
 

@@ -5,16 +5,12 @@
 namespace chess {
 
 void Piece::ValidMovesHandler::add(Pos pos, Move::Type type) {
-    // if (pos == b.getKingPos(getOtherSide(side)))
-    //     type = Move::Type::CheckCausing;
     res.emplace_back(pos, type);
 }
 
 bool Piece::ValidMovesHandler::tryAdd(Pos pos) {
-    // std::cout << "tryAdd(" << pos << ")\n";
     if (!pos.isValid())
         return true;
-    // std::cout << "tryAdd--(" << pos << ")\n";
 
     auto* ptr = b.at(pos);
     if (ptr && ptr->getSide() == side)
@@ -79,8 +75,6 @@ void King::getValidMoves(ValidMovesHandler vmh) const {
         auto* ptr = vmh.b.at(x, vmh.pos.y());
         if (auto* rook = dynamic_cast<const Rook*>(ptr)) {
             if (!rook->getMadeFirstMove()) {
-                std::cout << "ADDED castling" << vmh.pos + Pos{direction*2, 0}
-                << "\n";
                 vmh.add(vmh.pos + Pos{direction*2, 0}, type);
             }
         }
@@ -163,18 +157,10 @@ void Pawn::getValidMoves(ValidMovesHandler vmh) const {
             continue;
         auto* ptr = vmh.b.at(pos);
         if (ptr == nullptr || ptr->getSide() == getSide())
-            continue;
-        // std::cout << "enpassant check " << pos << "\n";
         if (vmh.b.getEnPassantTarget() == pos) {
-            //it can't be a promotion and a en passant at the same time
+            //It can't be a promotion and a en passant at the same time
             vmh.add(myPos + Pos(i, sgn), Move::Type::EnPassant);
         }
-        // if (auto pawn = dynamic_cast<const Pawn*>(ptr)) {
-        //     if(pawn->canBeEnPassanted) {
-        //         //it can't be a promotion and a en passant at the same time
-        //         vmh.add(myPos + Pos(i, sgn), Move::Type::EnPassant);
-        //     }
-        // }
     }
 }
 

@@ -34,13 +34,13 @@ struct Pos {
     constexpr bool isValid() const {
         return x() >= 0 && x() < 8 && y() >= 0 && y() < 8;
     }
-    //doesn't take care of invalid
+    // Doesn't take care of invalid
     constexpr void writeStringAt(char* c) const {
         c[0] = 'a' + x();
         c[1] = '1' + y();
     };
 
-    // you shouldn't check == Invalid. use isValid instead.
+    // You shouldn't check == Invalid. Use isValid() instead.
     static const Pos Invalid;
 };
 inline constexpr Pos Pos::Invalid = {-1, -1};
@@ -48,13 +48,12 @@ inline constexpr Pos Pos::Invalid = {-1, -1};
 struct Move {
     enum class Type {
         Normal,
-        // when a pawn moves two squares forward it can be eaten by en passant
+        // When a pawn moves two squares forward it can be eaten by en passant
         DoubleAdvance,
         EnPassant,
         Castling,
         QueensideCastling,
         Promotion,
-        // CheckCausing,
     };
     Pos pos;
     Type type;
@@ -74,7 +73,6 @@ struct FullMove {
     Pos from, to;
     PromotionResult promotionResult;
 
-    // constexpr FullMove() : FullMove({}, {}, {}) {}
     constexpr FullMove() : FullMove(Pos::Invalid, Pos::Invalid, {}) {}
     constexpr FullMove(Pos from, Pos to,
                        PromotionResult promotionResult = PromotionResult::None)

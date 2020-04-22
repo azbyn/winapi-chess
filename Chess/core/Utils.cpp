@@ -24,7 +24,6 @@ std::string WinapiError::makeMessage(std::string_view str, DWORD& code,
                                  (LPSTR)&msg,
                                  0,
                                  nullptr);
-    //ss << "(code 0x" <<std::hex << code << "): ";
     ss << "(code " << code << "): ";
     if (msg == nullptr) {
         ss << "No Winapi Error.";

@@ -7,9 +7,8 @@ static uint8_t toNormalVolume(int val) {
 }
 
 SoundManager::SoundManager() {
-    sfxOn = false;// true;
+    sfxOn = false;
     volume = toNormalVolume(5);
-    // setNiceVolume(5);
 }
 
 core::WaveSound<200>& SoundManager::getWav() {
@@ -45,8 +44,8 @@ void SoundManager::setVolume(uint8_t val) {
 }
 
 using Type = core::WaveSound<200>::Component::Type;
+
 void SoundManager::playPieceCapture() {
-    std::cout << "playCapture\n";
     if (!shouldPlay()) return;
     auto& w = instance().getWav();
     w.initSound({
@@ -57,7 +56,6 @@ void SoundManager::playPieceCapture() {
 }
 
 void SoundManager::playPieceMove() {
-    std::cout << "playPieceMove\n";
     if (!shouldPlay()) return;
     auto& w = instance().getWav();
 
@@ -67,7 +65,6 @@ void SoundManager::playPieceMove() {
     w.play();
 }
 void SoundManager::playSelected() {
-    std::cout << "playSelected\n";
     if (!shouldPlay()) return;
     auto& w = instance().getWav();
 
@@ -78,7 +75,6 @@ void SoundManager::playSelected() {
 }
 
 void SoundManager::playInvalid() {
-    std::cout << "playInvalid\n";
     if (!shouldPlay()) return;
     auto& w = instance().getWav();
     w.initSound({
@@ -88,6 +84,5 @@ void SoundManager::playInvalid() {
 }
 
 void SoundManager::playLeftRightMove() {
-    std::cout << "playLeftRightMove\n";
     playSelected();
 }

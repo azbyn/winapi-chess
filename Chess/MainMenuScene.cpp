@@ -22,7 +22,6 @@ enum Button : int {
     BtnCount,
 };
 
-
 static void onReturnFromOptions() {
     SceneManager::load<MainMenuScene>();
 }
@@ -51,7 +50,6 @@ void MainMenuScene::onSizeChanged(core::Point size) {
 }
 
 void MainMenuScene::onDrawBackground(core::Paint& p) {
-    std::cout << "draw bg\n";
     constexpr const char* titleFont = "Arial";
     constexpr int titleSize = 110;
 
@@ -63,7 +61,6 @@ void MainMenuScene::onDrawBackground(core::Paint& p) {
     MenuScene::onDrawBackground(p);
 }
 void MainMenuScene::onDrawExtra(Paint& p) {
-    // std::cout << "draw extra\n";
     // side
     auto rect = getButtonRect(Button::Side);
 
@@ -71,20 +68,16 @@ void MainMenuScene::onDrawExtra(Paint& p) {
     auto pt = rect.p1() - (rect.height() * Point{1,1} - sprite.size() / 2);
     p.drawSprite(pt, sprite, chess::Piece::getPalette(side));
 }
-void MainMenuScene::startGame() {
-    MainScene::newGame(side);
-}
 void MainMenuScene::onButtonSelected(int index) {
     MenuScene::onButtonSelected(index);
     switch (index) {
     case Button::Play:
-        startGame();
+        MainScene::newGame(side);
         return;
     case Button::Side:
         side = getOtherSide(side);
         break;
     case Button::Difficulty:
-        // MenuScene::onButtonSelected(index);
         break;
     case Button::Options:
         OptionsScene::load(onReturnFromOptions);

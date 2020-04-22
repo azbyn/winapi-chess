@@ -83,12 +83,11 @@ void Paint::StretchData::setShouldStretch(bool val) {
     shouldStretch = val;
     if (!val) {
         dstToSrcRatio = 1;
-    // } else {
     }
 }
 
 Point Paint::StretchData::dstToSrcCoord(Point dstPt) {
-    dstPt -= drawRect.p0();// offset;
+    dstPt -= drawRect.p0();
     return {int(dstPt.x * dstToSrcRatio), int(dstPt.y * dstToSrcRatio)};
 }
 
@@ -136,7 +135,8 @@ void Paint::copyTo(Paint& dst) const {
 // Not using a Rect& here is intentional
 // DrawTextA takes a non const RECT*
 // (and probably does something with it)
-// I don't care about that, so I'll ignore it
+//
+// I don't care about that, so I'll ignore it.
 void Paint::drawText(Rect r, std::string_view s, UINT format) {
     RECT winRect = r;
     if (!::DrawTextA(hdc, s.data(), (int) s.length(), &winRect, format))
@@ -163,11 +163,11 @@ HFONT Paint::setFontImpl(const char* name, int size, bool bold) {
         false,//italic
         false,//underline
         false,//strikeout
-        ANSI_CHARSET, //DEFAULT_CHARSET
+        ANSI_CHARSET,
         OUT_DEFAULT_PRECIS,
         CLIP_DEFAULT_PRECIS,
-        NONANTIALIASED_QUALITY,// DEFAULT_QUALITY, //CLEARTYPE_QUALITY
-        DEFAULT_PITCH, //VARIABLE_PITCH
+        NONANTIALIASED_QUALITY,
+        DEFAULT_PITCH,
         name);
     if (font == nullptr)
         throw WinapiError("CreateFontA");
@@ -182,7 +182,7 @@ void Paint::setPixel(int x, int y, Color col) {
     setPixel({x, y}, col);
 }
 void Paint::setPixel(Point p, Color col) {
-    //it's not really an error to go draw of bounds.
+    // It's not really an error to go draw of bounds.
     if (!bounds.contains(p)) return;
     setPixelUnchecked(p.x, p.y, col);
 }
@@ -194,12 +194,6 @@ void Paint::fill(Color col) {
 }
 
 void Paint::fillCircle(Point c, int r, Color col) {
-    // int xMin = std::max(0, c.x - radius);
-    // int yMin = std::max(0, c.y - radius);
-
-    // int xMax = std::min(width()-1, c.x + radius);
-    // int yMax = std::min(height()-1, c.y + radius);
-
     // There are exactly 4 pixels at distance r from c
     // drawing those is kinda ugly
     int xMin = std::max(0, c.x - r+1);
@@ -222,11 +216,11 @@ void Paint::fillCircle(Point c, int r, Color col) {
 void Paint::fillPixelatedCircle(Point c, int radius, Color col,
                                 int pixelSize) {
     auto r = radius / pixelSize;
-    auto r2 = r *r;
-    for (int j = -r+1; j < r; ++j) {
-        for (int i = -r+1; i < r; ++i) {
-            if (i*i+j*j <=r2) {
-                Point start = c + Point(i, j)*pixelSize;
+    auto r2 = r*r;
+    for (int j = -r + 1; j < r; ++j) {
+        for (int i = -r + 1; i < r; ++i) {
+            if (i*i + j*j <= r2) {
+                Point start = c + Point(i, j) * pixelSize;
                 fillRect({start, start + Point(pixelSize, pixelSize)}, col);
             }
         }
@@ -237,10 +231,10 @@ void Paint::fillRect(int x0, int y0, int x1, int y1, Color col) {
     fillRect({x0, y0, x1, y1}, col);
 }
 void Paint::drawRectIn(Rect r, int t, Color col) {
-    fillRect(r.x0(), r.y0(), r.x1(), r.y0()+t, col);
-    fillRect(r.x0(), r.y0()+t, r.x0()+t, r.y1(), col);
-    fillRect(r.x1()-t, r.y0()+t, r.x1(), r.y1(), col);
-    fillRect(r.x0()+t, r.y1()-t, r.x1()-t, r.y1(), col);
+    fillRect(r.x0(),     r.y0(),     r.x1(),     r.y0() + t, col);
+    fillRect(r.x0(),     r.y0() + t, r.x0() + t, r.y1(),     col);
+    fillRect(r.x1() - t, r.y0() + t, r.x1(),     r.y1(),     col);
+    fillRect(r.x0() + t, r.y1() - t, r.x1() - t, r.y1(),     col);
 }
 
 void Paint::drawRectOut(Rect r, int thickness, Color col) {
@@ -254,11 +248,65 @@ void Paint::drawRectOut(Rect r, int thickness, Color col) {
 void Paint::fillRect(Rect r, Color col) {
     if (r.x0() < 0) r.x0() = 0;
     if (r.y0() < 0) r.y0() = 0;
-    if (r.x1() >= width()) r.x1() = width()-1;
-    if (r.y1() >= height()) r.y1() = height()-1;
+    if (r.x1() >= width()) r.x1() = width() - 1;
+    if (r.y1() >= height()) r.y1() = height() - 1;
     for (auto j = r.y0(); j < r.y1(); ++j)
         for (auto i = r.x0(); i < r.x1(); ++i)
             setPixelUnchecked(i, j, col);
+}
+
+
+void Paint::setPixelUnchecked(int x, int y, Color col) {
+    auto at = [this] (int x, int y) {
+        return data + (y*width()+x)*3;
+    };
+    setPixelUnchecked(at(x, y), col);
+}
+void Paint::setPixelUnchecked(uint8_t* ptr, Color col) {
+    constexpr auto setColor = [](uint8_t* ptr, Color col) {
+        ptr[2] = col.r();
+        ptr[1] = col.g();
+        ptr[0] = col.b();
+    };
+    constexpr auto getColor = [] (const uint8_t* ptr) {
+        return Color(ptr[2], ptr[1], ptr[0]);
+    };
+    Color c = getColor(ptr);
+    setColor(ptr, Color::lerp8(c, col, col.a()));
+}
+
+void Paint::drawSprite(Point p, const PaletteSprite& s, const Palette& pal) {
+    for (size_t j = 0; j < s.height(); ++j) {
+        for (size_t i = 0; i < s.width(); ++i) {
+            auto index = s.at(i, j);
+            if (index) setPixel(p + Point(i, j), pal[index]);
+        }
+    }
+}
+
+void Paint::drawSprite(Point p, const PaletteSprite& s, const Palette& pal,
+                       int scale) {
+    for (size_t j = 0; j < s.height(); ++j) {
+        for (size_t i = 0; i < s.width(); ++i) {
+            auto index = s.at(i, j);
+            if (!index)
+                continue;
+            auto start = Point(i, j) * scale + p;
+            fillRect({start, start + Point(scale, scale)}, pal[index]);
+        }
+    }
+}
+
+void Paint::drawSprite(int x, int y, const PaletteSprite& s,
+                       const Palette& pal) {
+    return drawSprite({x, y}, s, pal);
+}
+
+void Paint::drawSprite(int x, int y,
+                       const PaletteSprite& s,
+                       const Palette& palette,
+                       int scale) {
+    return drawSprite({x, y}, s, palette, scale);
 }
 
 } // namespace core

@@ -1,30 +1,27 @@
 #pragma once
 
-#include "core/Paint.h"
+#include "core/ConstPaletteSprite.h"
 
 namespace sprites {
 constexpr char CharPalette[] = ".012";
-using Sprite = core::PaletteSprite<32, 32, CharPalette>;
-using PiecePalette = core::Palette<4>;
 
-template<size_t Width, size_t Height, const char CharPalette_[]>
-using PaletteSprite = core::PaletteSprite<Width, Height, CharPalette_>;
-
-constexpr PiecePalette WhitePalette {
+// template<size_t Width, size_t Height, const char CharPalette_[]>
+// using PaletteSprite = core::PaletteSprite<Width, Height, CharPalette_>;
+constexpr core::ConstPalette<CharPalette> WhitePalette {
     core::Color::Clear,
     core::Color::DarkGray,
     core::Color::LightGray,
     core::Color::White,
 };
-constexpr PiecePalette BlackPalette {
+constexpr core::ConstPalette<CharPalette> BlackPalette {
     core::Color::Clear,
     core::Color::LightGray,
     core::Color::DarkGray,
     core::Color::Black,
 };
 
-//generated with a pgm_to_sprite
-constexpr PaletteSprite<32, 32, CharPalette> King {
+// Generated with pgm_to_sprite
+constexpr core::ConstPaletteSprite<32, 32, CharPalette> King {
     "................................",
     "................................",
     "...............11...............",
@@ -59,7 +56,7 @@ constexpr PaletteSprite<32, 32, CharPalette> King {
     "................................",
 };
 
-constexpr PaletteSprite<32, 32, CharPalette> Queen {
+constexpr core::ConstPaletteSprite<32, 32, CharPalette> Queen {
     "................................",
     "................................",
     "...............11...............",
@@ -93,7 +90,7 @@ constexpr PaletteSprite<32, 32, CharPalette> Queen {
     "................................",
     "................................",
 };
-constexpr PaletteSprite<32, 32, CharPalette> Rook {
+constexpr core::ConstPaletteSprite<32, 32, CharPalette> Rook {
     "................................",
     "................................",
     "................................",
@@ -127,7 +124,7 @@ constexpr PaletteSprite<32, 32, CharPalette> Rook {
     "................................",
     "................................",
 };
-constexpr PaletteSprite<32, 32, CharPalette> Bishop {
+constexpr core::ConstPaletteSprite<32, 32, CharPalette> Bishop {
     "................................",
     "................................",
     "...............11...............",
@@ -161,7 +158,7 @@ constexpr PaletteSprite<32, 32, CharPalette> Bishop {
     "................................",
     "................................",
 };
-constexpr PaletteSprite<32, 32, CharPalette> Knight {
+constexpr core::ConstPaletteSprite<32, 32, CharPalette> Knight {
     "................................",
     "................................",
     "................................",
@@ -197,7 +194,7 @@ constexpr PaletteSprite<32, 32, CharPalette> Knight {
 };
 
 
-constexpr PaletteSprite<32, 32, CharPalette> Pawn {
+constexpr core::ConstPaletteSprite<32, 32, CharPalette> Pawn {
     "................................",
     "................................",
     "................................",
@@ -232,13 +229,13 @@ constexpr PaletteSprite<32, 32, CharPalette> Pawn {
     "................................",
 };
 
-constexpr core::Palette<4> CursorPalette = {
+constexpr core::ConstPalette<CharPalette> CursorPalette = {
     core::Color::Clear,
     core::Color::Black,
     core::Color::Clear,
     core::Color::White,
 };
-constexpr PaletteSprite<32, 32, CharPalette> Cursor {
+constexpr core::ConstPaletteSprite<32, 32, CharPalette> Cursor {
     ".2222222................2222222.",
     "200000002..............200000002",
     "20222222................22222202",
@@ -273,21 +270,21 @@ constexpr PaletteSprite<32, 32, CharPalette> Cursor {
     ".2222222................2222222.",
 };
 
-constexpr core::Palette<4> ValidBtnPalette = {
+constexpr core::ConstPalette<CharPalette> ValidBtnPalette = {
     core::Color::Clear,
     core::Color::White,
     core::Color::Clear,
     core::Color::Gray,//white
 };
 
-constexpr core::Palette<4> InvalidBtnPalette = {
+constexpr core::ConstPalette<CharPalette> InvalidBtnPalette = {
     core::Color::Clear,
     core::Color::LightGray.withAlpha(128),
     core::Color::Clear,
     core::Color::Gray.withAlpha(128),
 };
 
-constexpr PaletteSprite<32, 32, CharPalette> Left {
+constexpr core::ConstPaletteSprite<32, 32, CharPalette> Left {
     "................................",
     "................................",
     "................................",
@@ -321,7 +318,7 @@ constexpr PaletteSprite<32, 32, CharPalette> Left {
     "................................",
     "................................",
 };
-constexpr PaletteSprite<32, 32, CharPalette> Right {
+constexpr core::ConstPaletteSprite<32, 32, CharPalette> Right {
     "................................",
     "................................",
     "................................",
@@ -356,15 +353,14 @@ constexpr PaletteSprite<32, 32, CharPalette> Right {
     "................................",
 };
 
-
-constexpr core::Palette<4> RadioBtnPalette = {
+constexpr core::ConstPalette<CharPalette> RadioBtnPalette = {
     core::Color::Clear,
     core::Color::White,
     core::Color::Green,
     core::Color::Clear,
 };
 
-constexpr PaletteSprite<32, 32, CharPalette> RadioBtnChecked {
+constexpr core::ConstPaletteSprite<32, 32, CharPalette> RadioBtnChecked {
     "................................",
     "................................",
     "................................",
@@ -398,7 +394,7 @@ constexpr PaletteSprite<32, 32, CharPalette> RadioBtnChecked {
     "................................",
     "................................",
 };
-constexpr PaletteSprite<32, 32, CharPalette> RadioBtnUnchecked {
+constexpr core::ConstPaletteSprite<32, 32, CharPalette> RadioBtnUnchecked {
     "................................",
     "................................",
     "................................",

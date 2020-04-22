@@ -2,7 +2,7 @@
 
 #include "Utils.h"
 #include "Color.h"
-#include "Sprite.h"
+#include "PaletteSprite.h"
 
 #include <array>
 #include <vector>
@@ -19,14 +19,9 @@ constexpr static auto MultilineCenter =
     DT_CENTER | DT_NOCLIP;
 }
 
-//first color is reserved for transparency
-template<size_t size>
-using Palette = std::array<Color, size>;
-
-
 class Paint {
 public:
-    //only to be used in WindowHandler
+    // Only to be used in WindowHandler
     class StretchData {
     public:
         // We don't use an actual rect because ::StretchBlt takes
@@ -39,12 +34,6 @@ public:
             constexpr SzRect(int x, int y, int w, int h)
                 : x(x), y(y), w(w), h(h) {}
 
-            // constexpr SzRect(Rect r)
-            //     : x(r.x0()), y(r.y0()), w(r.width()), h(r.height()) {}
-
-            // constexpr operator Rect() const {
-            //     return {x, y, x+w, y+h};
-            // }
             constexpr Point p0() const { return {x, y}; }
             constexpr int x1() const { return x + w; }
             constexpr int y1() const { return y + h; }
@@ -61,24 +50,16 @@ public:
     private:
         double dstToSrcRatio;
         bool shouldStretch;
-        //we cache those
+
         double srcAspectRatio;
-        Point srcSize; //, dstSize;
+        Point srcSize;
 
         std::array<SzRect, 2> margins;
         SzRect drawRect;
 
-        // double dstAR;
-
-        // Point marginSize;
-        // Point secondMarginPoint;
-
-
-        // Point size;
-        // Point offset;
-
         friend class Paint;
     };
+
     Paint(HDC ogHDC, Point size);
     ~Paint() noexcept;
 
@@ -119,45 +100,37 @@ public:
     void fillRect(int x0, int y0, int x1, int y1, Color col);
     void fillRect(Rect r, Color col);
 
-    //draws a border inside r
+    // Draws a border inside r
     void drawRectIn(Rect r, int thickness, Color col);
 
-    //draws a border outside r
+    // Draws a border outside r
     void drawRectOut(Rect r, int thickness, Color col);
 
     void fill(Color col);
 
     void fillCircle(Point center, int radius, Color col);
-    //A purposefully pixelated circle looks better than one without antialiasing
+    // A purposefully pixelated circle looks better than one without antialiasing
     void fillPixelatedCircle(Point center, int radius, Color col,
                              int pixelSize);
 
-    template<size_t Width, size_t Height, const char CharPalette_[],
-             size_t PaletteSize>
     void drawSprite(int x, int y,
-                    const PaletteSprite<Width, Height, CharPalette_>& s,
-                    const Palette<PaletteSize>& palette);
+                    const PaletteSprite& sprite,
+                    const Palette& palette);
 
-    template<size_t Width, size_t Height, const char CharPalette_[],
-             size_t PaletteSize>
     void drawSprite(int x, int y,
-                    const PaletteSprite<Width, Height, CharPalette_>& s,
-                    const Palette<PaletteSize>& palette,
+                    const PaletteSprite& sprite,
+                    const Palette& palette,
                     int scale);
 
-
-    template<size_t Width, size_t Height, const char CharPalette_[],
-             size_t PaletteSize>
     void drawSprite(Point p,
-                    const PaletteSprite<Width, Height, CharPalette_>& s,
-                    const Palette<PaletteSize>& palette);
+                    const PaletteSprite& sprite,
+                    const Palette& palette);
 
-    template<size_t Width, size_t Height, const char CharPalette_[],
-             size_t PaletteSize>
     void drawSprite(Point p,
-                    const PaletteSprite<Width, Height, CharPalette_>& s,
-                    const Palette<PaletteSize>& palette,
+                    const PaletteSprite& s,
+                    const Palette& palette,
                     int scale);
+
     void getSnapshot(std::vector<uint8_t>& snap) const;
     void setSnapshot(const std::vector<uint8_t>& snap);
 
@@ -173,69 +146,8 @@ private:
     constexpr int byteSize() const { return bmi.bmiHeader.biSizeImage; }
     HFONT setFontImpl(const char* name, int size, bool bold);
 
-    constexpr void setPixelUnchecked(uint8_t* ptr, Color col);
-    constexpr void setPixelUnchecked(int x, int y, Color col);
+    void setPixelUnchecked(uint8_t* ptr, Color col);
+    void setPixelUnchecked(int x, int y, Color col);
 };
-
-constexpr void Paint::setPixelUnchecked(int x, int y, Color col) {
-    auto at = [this] (int x, int y) {
-        return data + (y*width()+x)*3;
-    };
-    setPixelUnchecked(at(x, y), col);
-}
-constexpr void Paint::setPixelUnchecked(uint8_t* ptr, Color col) {
-    constexpr auto setColor = [](uint8_t* ptr, Color col) {
-        ptr[2] = col.r();
-        ptr[1] = col.g();
-        ptr[0] = col.b();
-    };
-    constexpr auto getColor = [] (const uint8_t* ptr) {
-        return Color(ptr[2], ptr[1], ptr[0]);
-    };
-    Color c = getColor(ptr);
-    setColor(ptr, Color::lerp8(c, col, col.a()));
-}
-
-template<size_t W, size_t H, const char CP[], size_t PSize>
-void Paint::drawSprite(Point p, const PaletteSprite<W, H, CP>& s,
-                       const Palette<PSize>& palette) {
-    for (size_t j = 0; j < H; ++j) {
-        for (size_t i = 0; i < W; ++i) {
-            auto index = s(i, j);
-            if (index) setPixel(p + Point(i, j), palette[index]);
-        }
-    }
-}
-
-template<size_t W, size_t H, const char CP[], size_t PSize>
-void Paint::drawSprite(Point p,
-                       const PaletteSprite<W, H, CP>& s,
-                       const Palette<PSize>& palette,
-                       int scale) {
-    for (size_t j = 0; j < H; ++j) {
-        for (size_t i = 0; i < W; ++i) {
-            auto index = s(i, j);
-            if (!index)
-                continue;
-            auto start = Point(i, j) * scale + p;
-            fillRect({start, start + Point(scale, scale)}, palette[index]);
-        }
-    }
-}
-
-template<size_t W, size_t H, const char CP[], size_t PSize>
-void Paint::drawSprite(int x, int y,
-                       const PaletteSprite<W, H, CP>& s,
-                       const Palette<PSize>& palette) {
-    return drawSprite({x, y}, s, palette);
-}
-
-template<size_t W, size_t H, const char CP[], size_t PSize>
-void Paint::drawSprite(int x, int y,
-                       const PaletteSprite<W, H, CP>& s,
-                       const Palette<PSize>& palette,
-                       int scale) {
-    return drawSprite({x, y}, s, palette, scale);
-}
 
 } // namespace core

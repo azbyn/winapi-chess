@@ -7,10 +7,6 @@
 
 using namespace core;
 
-// constexpr int BoardBorder = SquareLength / 2;
-// constexpr int RightPaneMargin = BoardBorder * 3 / 4;
-// constexpr auto RightPaneWidth = SquareLength * 4;
-
 static void onPromotion(chess::Side side) {
     PromotionScene::onPromotion(side);
 }
@@ -28,14 +24,12 @@ static void onGameDraw(chess::FullMove move, std::string_view why) {
 }
 void MainScene::onExecutedMove(chess::FullMove) {
     instance().bot.onPlayerMove(instance().board.getState());
-    // SoundManager::playPieceMove();
 }
 
 void MainScene::onFoundMove(chess::FullMove m) {
     auto& i = instance();
     i.board.doFullMove(m);
     i.pieceMovingData.setInterpolatedMove(m);
-    std::cout << "redraw\n";
     i.redraw();
     SoundManager::playPieceMove();
 }
@@ -64,7 +58,6 @@ void MainScene::newGameImpl(chess::Side side) {
     cursor = {4, side == chess::Side::White ? 0 : 7}; //the king
 
     playerNames[playerSide] = "Player";
-    std::cout << "diff: "<< bot.getDifficulty()<<"\n";
     playerNames[getOtherSide(playerSide)] = concat("Bot ", bot.getDifficulty());
     selectedPos = chess::Pos::Invalid;
     pieceMovingData.reset();
@@ -97,7 +90,6 @@ void MainScene::moveVert(int dir) {
     if (cursor.y() > 7) cursor.y() = 7;
 }
 
-
 bool MainScene::isSelected() const { return selectedPos.isValid(); }
 void MainScene::deselect() {
     validMoves.clear();
@@ -108,7 +100,7 @@ bool MainScene::trySelect(chess::Pos pos) {
     deselect();
     auto& val = board.at(pos);
 
-    if (!val || val->getSide() != playerSide)// board.currentSide())
+    if (!val || val->getSide() != playerSide)
         return false;
     val->getValidMoves(pos, board.getState(), validMoves);
 
@@ -117,7 +109,7 @@ bool MainScene::trySelect(chess::Pos pos) {
 }
 
 void MainScene::spaceAction() {
-    if (board.getCurrentSide() != playerSide) {// board.currentSide()) {
+    if (board.getCurrentSide() != playerSide) {
         deselect();
         return;
     }
@@ -166,7 +158,7 @@ void MainScene::onLeftMouseUp(Point pt) {
             deselect();
         }
 
-        pieceMovingData.stop();// releaseMouse();
+        pieceMovingData.stop();
         redraw();
     }
 }
@@ -199,9 +191,6 @@ void MainScene::onKeyDown(char k) {
     case 'S':
     case VK_DOWN:
         moveVert(-1);
-        break;
-    case 'C':
-        onCheckmate({{0, 0}, {0,7}}, chess::Side::Black);
         break;
     case VK_RETURN:
     case VK_SPACE:

@@ -28,8 +28,6 @@ constexpr core::Point VertButtonSize {350, 64};
 constexpr int ButtonSpacing = 5;
 constexpr int SmallTitleSize = 80;
 
-// constexpr static core::Color MarginCol = Color::Black;
-
 constexpr core::Point getVertButtonsSize(int count) {
     return {VertButtonSize.x,
             (VertButtonSize.y + ButtonSpacing) * count - ButtonSpacing};

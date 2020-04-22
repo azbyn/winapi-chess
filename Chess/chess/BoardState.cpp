@@ -46,14 +46,12 @@ void BoardState::update() {
             auto pos = kingPos[side];
             for (auto m : validMoves) {
                 if (m.pos == pos) {
-                    std::cout << "King is in check!\n";
                     isInCheck[side] = true;
                 }
             }
         }
     }
 }
-//bool BoardState::isCheckMate(Side side) const {
 GameResult BoardState::testWinOrStalemate(Side side) const {
     std::vector<Move> validMoves;
     for (int j = 0; j < 8; ++j) {
@@ -73,8 +71,6 @@ bool BoardState::moveLeavesInCheck(Pos from, Pos to) const {
         throw std::logic_error("moveEscapesCheck has ptr == null");
 
     auto side = ptr->getSide();
-    //std::cout << "checking for side  " << side << "\n";
-    // std::cout << "checking for side H" << side << "\n";
 
     BoardState state = *this;
 
@@ -82,7 +78,6 @@ bool BoardState::moveLeavesInCheck(Pos from, Pos to) const {
     state.at(from) = nullptr;
     state.update();
 
-    // std::cout << "leaves in check: "<< state.isInCheck[side] << "\n";
     return state.isInCheck[side];
 }
 std::string BoardState::getFEN() const {
@@ -130,8 +125,7 @@ std::ostream& BoardState::shortenedFenImpl(std::ostream& s) const {
     // castling
     auto kingCanCastle = [&] (int x, int y) {
         if (auto* ptr = at(x, y)) {
-            // we could not check for the type, but this way it more verbose
-            // std::cout << "<K: " << ptr->getLetter() << ">";
+            // We could not check for the type, but this way it more verbose
             if (auto* king = dynamic_cast<const King*>(ptr)) {
                 return !king->getMadeFirstMove();
             }
@@ -142,7 +136,6 @@ std::ostream& BoardState::shortenedFenImpl(std::ostream& s) const {
     //returns true if we can castle with that rook and appends to string
     auto rookCanCastle = [&] (int x, int y, char c) {
         if (auto* ptr = at(x, y)) {
-            // std::cout << "<R: " << ptr->getLetter() << ">";
             if (auto* rook = dynamic_cast<const Rook*>(ptr)) {
                 if (!rook->getMadeFirstMove()) {
                     s << c;
@@ -162,7 +155,7 @@ std::ostream& BoardState::shortenedFenImpl(std::ostream& s) const {
 
     if (!checkCastlingForSide(0, 'Q', 'K') &
         !checkCastlingForSide(7, 'q', 'k')) {
-        //if we can't do any castling we should add a -
+        //if we can't do any castling we should add a '-'
         s << '-';
     }
 

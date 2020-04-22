@@ -6,17 +6,13 @@
 #include <algorithm>
 #include <vector>
 
-using sprites::Sprite;
-using sprites::PiecePalette;
-
 namespace chess {
 
 class Board;
 class BoardState;
 class Piece {
-public:
 protected:
-    // a lot of those would have been repeated, so we use a class
+    using Sprite = core::PaletteSprite;
     struct ValidMovesHandler {
         const BoardState& b;
         std::vector<Move>& res;
@@ -25,7 +21,7 @@ protected:
 
         void add(Pos pos, Move::Type type = Move::Type::Normal);
 
-        // doesn't add if the piece has the same side as the param
+        // Doesn't add if the piece has the same side as the param
         // returns true if we should stop (when going in a direction)
         bool tryAdd(Pos pos);
 
@@ -44,7 +40,7 @@ public:
 
     virtual const Sprite& getSprite() const = 0;
 
-    constexpr static const core::Palette<4>& getPalette(Side side) {
+    constexpr static const auto& getPalette(Side side) {
         if (side == Side::White)
             return sprites::WhitePalette;
         return sprites::BlackPalette;
@@ -66,7 +62,7 @@ public:
 
 protected:
     virtual void getValidMoves(ValidMovesHandler vmh) const = 0;
-    // shouldn't care about the side of the piece
+    // Shouldn't care about the side of the piece
     virtual char getLetterImpl() const = 0;
 
 private:

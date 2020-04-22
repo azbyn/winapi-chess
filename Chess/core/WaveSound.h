@@ -49,19 +49,17 @@ public:
         subChunk1Size = 16; // 16 for PCM
         format  = 0x45564157; // "WAVE" in little endian
 
-        subChunk1ID = 0x20746d66;   // "fmt " in little endian
-        audioFormat = 1;   // 1 for PCM, 3 fot EEE floating point, 7 for μ-law
-        numChannels = NumChannels;   // 1 for mono, 2 for stereo
-        sampleRate = SampleRate;    // 8000, 22050, 44100, etc...
+        subChunk1ID = 0x20746d66; // "fmt " in little endian
+        audioFormat = 1; // 1 for PCM, 3 fot EEE floating point, 7 for μ-law
+        numChannels = NumChannels; // 1 for mono, 2 for stereo
+        sampleRate = SampleRate; // 8000, 22050, 44100, etc...
         bitsPerSample = BitsPerSample; // number of bits (8 for 8 bits, etc...)
 
         blockAlign = NumChannels * BitsPerSample/8;
         byteRate = SampleRate * NumChannels * BitsPerSample/8;
 
         subChunk2ID = 0x61746164; // "data" in little endian
-        //(this is the actual data size in bytes)
-        subChunk2Size = ByteSize; // NumSamples * numChannels * bitsPerSample/8;
-
+        subChunk2Size = ByteSize; //(this is the actual data size in bytes)
         chunkSize = 4 + (8 + subChunk1Size) + (8 + subChunk2Size);
     }
 
@@ -75,18 +73,6 @@ public:
         if (!::PlaySound(nullptr, nullptr, flags))
             throw core::WinapiError("PlaySound failed");
     }
-    // void smoothing(int size = 5) {
-    //     static std::array<uint8_t, ByteSize> bak;
-    //     std::copy(std::begin(data), std::end(data),bak.begin());
-    //     int hs = size/2;
-    //     for (size_t i = 0; i < ByteSize; ++i) {
-    //         int sum = 0;
-    //         for (int j = std::min(0, int(i-hs));
-    //              j < std::max(int(ByteSize), int(i+hs)); ++j)
-    //             sum += bak[j];
-    //        data[i] = sum / size;
-    //     }
-    // }
     struct Component {
         enum class Type {
             Square, Sin, Noise
@@ -117,7 +103,6 @@ public:
             return 0;
         }
     };
-    // template<typename ... Components>
     void initSound(std::initializer_list<Component> components,
                    size_t t0 = ByteSize/5, size_t t1 = (2*ByteSize) / 5) {
         std::vector comps =components;

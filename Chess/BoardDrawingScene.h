@@ -9,11 +9,11 @@ class BoardDrawingScene : public virtual core::Scene {
 public:
     static core::Rect getBoardRect(core::Point size);
 
-    //must be called by subclass
+    // Must be called by subclass
     void onSizeChanged(core::Point size) override;
-    //must be called by subclass
+    // Must be called by subclass
     void onDrawBackground(core::Paint& paint) override;
-    //must be called by subclass
+    // Must be called by subclass
     void onDraw(core::Paint& paint) override;
 
 protected:
@@ -26,44 +26,55 @@ protected:
     core::Point boardPosToScreen(chess::Pos boardPos) const;
     chess::Pos screenToBoardPos(core::Point pt) const;
 
-    void drawBoardSquares(core::Paint& paint) const;
+    virtual void drawBoardSquares(core::Paint& paint) const;
     // A..H, 1..8
-    void drawBoardMarkings(core::Paint& paint) const;
-    void drawEatenPieces(core::Paint& paint) const;
+    virtual void drawBoardMarkings(core::Paint& paint) const;
+    virtual void drawEatenPieces(core::Paint& paint) const;
     //must be called
     virtual void drawBoard(core::Paint& paint) const;
-    void drawRightPaneInfo(core::Paint& paint) const;
+    virtual void drawRightPaneInfo(core::Paint& paint) const;
 
-    template<size_t W, size_t H, const char CP[], size_t PSize>
     void spriteAt(core::Paint& paint, core::Point pt,
-                  const core::PaletteSprite<W, H, CP>& s,
-                  const core::Palette<PSize>& palette) const {
-        constexpr size_t scale = SquareLength / W;
-        paint.drawSprite(pt, s, palette, scale);
-    }
-    template<size_t W, size_t H, const char CP[], size_t PSize>
+                  const core::PaletteSprite& s,
+                  const core::Palette& palette) const;
+
     void spriteOnBoard(core::Paint& paint, chess::Pos p,
-                       const core::PaletteSprite<W, H, CP>& s,
-                       const core::Palette<PSize>& palette) const {
-        spriteAt(paint, boardPosToScreen(p), s, palette);
-    }
+                       const core::PaletteSprite& s,
+                       const core::Palette& palette) const;
 
     const core::Rect& getBoardRect() const { return boardRect; }
 
 private:
-    // without margins (the bits with 1..8, A..H)
+    // without the markings (the part with 1..8, A..H)
     core::Rect boardRect;
     core::Rect paneRect;
 
-
 protected:
-    // for nice move interpolating
+    // Move interpolating
     struct PieceMovingData {
         enum class State {
             NotMoving,
             Interpolating,
             MouseMoving,
         };
+
+        PieceMovingData(const BoardDrawingScene& parent) : parent(parent) {}
+        void reset() {
+            state = State::NotMoving;
+            piecePos = chess::Pos::Invalid;
+        }
+        constexpr bool isMoving() const { return state != State::NotMoving; }
+        constexpr chess::Pos getPiecePos() const { return piecePos; }
+
+        core::Point getPoint();
+
+        void setInterpolatedMove(chess::FullMove move);
+
+        void setMousePos(core::Point p, chess::Pos boardPos);
+        // Returns true if should redraw
+        bool onMouseMove(core::Point p);
+
+        void stop();
 
     private:
         const BoardDrawingScene& parent;
@@ -80,26 +91,8 @@ protected:
         };
 
         std::chrono::time_point<std::chrono::system_clock> t0;
-
-    public:
-        PieceMovingData(const BoardDrawingScene& parent) : parent(parent) {}
-        void reset() {
-            state = State::NotMoving;
-            piecePos = chess::Pos::Invalid;
-        }
-        constexpr bool isMoving() const { return state != State::NotMoving; }
-        constexpr chess::Pos getPiecePos() const { return piecePos; }
-
-        core::Point getPoint();
-
-        void setInterpolatedMove(chess::FullMove move);
-
-        void setMousePos(core::Point p, chess::Pos boardPos);
-        //returns true if should redraw
-        bool onMouseMove(core::Point p);
-
-        void stop();
     } pieceMovingData;
+
 private:
     core::Point boardStart() const { return boardRect.topLeft(); }
 };

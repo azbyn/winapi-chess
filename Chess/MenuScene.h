@@ -14,7 +14,7 @@ public:
             GetVal getVal;
         };
         struct SpriteRadio {
-            //all the drawaing should be done in the subclass
+            // all the drawaing should be done in the subclass
         };
         struct LeftRight {
             using GetVal = int (*)();
@@ -61,52 +61,37 @@ public:
 
     MenuScene(std::initializer_list<ButtonData> buttons, Mode mode);
 
-    template<size_t Width, size_t Height, const char CP[], size_t PaletteSize>
     void drawLeft(core::Paint& p, size_t index,
-                  const core::PaletteSprite<Width, Height, CP>& sprite,
-                  const core::Palette<PaletteSize>& palette) const {
-        drawLeft(p, getButtonRect(index), sprite, palette);
-    }
+                  const core::PaletteSprite& sprite,
+                  const core::Palette& palette) const;
 
-    template<size_t Width, size_t Height, const char CP[], size_t PaletteSize>
     void drawLeft(core::Paint& p, const core::Rect& r,
-                  const core::PaletteSprite<Width, Height, CP>& sprite,
-                  const core::Palette<PaletteSize>& palette) const {
-        p.drawSprite(r.topLeft(), sprite, palette, r.height()/Height);
-    }
+                  const core::PaletteSprite& sprite,
+                  const core::Palette& palette) const;
 
-    template<size_t Width, size_t Height, const char CP[], size_t PaletteSize>
     void drawRight(core::Paint& p, const core::Rect& r,
-                   const core::PaletteSprite<Width, Height, CP>& sprite,
-                   const core::Palette<PaletteSize>& palette) const {
-        p.drawSprite(r.topRight() - core::Point{r.height(), 0},
-                     sprite, palette, r.height()/Height);
-    }
-    template<size_t Width, size_t Height, const char CP[], size_t PaletteSize>
+                   const core::PaletteSprite& sprite,
+                   const core::Palette& palette) const;
+
     void drawRight(core::Paint& p, size_t index,
-                   const core::PaletteSprite<Width, Height, CP>& sprite,
-                   const core::Palette<PaletteSize>& palette) const {
+                   const core::PaletteSprite& sprite,
+                   const core::Palette& palette) const;
 
-        drawRight(p, getButtonRect(index), sprite, palette);
-    }
-
-    //should be called from onSizeChanged
+    // Should be called from onSizeChanged
     void updateVertSizes(core::Rect r);
 
-    // if you want to override this use onDrawExtra
+    // If you want to override this use onDrawExtra
     // only override in special cases
     void onDraw(core::Paint& p) override;
     virtual void onDrawExtra(core::Paint& /*p*/) {}
-    // must be called by subclass
+    // Must be called by subclass
     void onDrawBackground(core::Paint& p) override;
 
-    // must be called by subclass
+    // Must be called by subclass
     void onButtonSelected(int i) override;
 
-    // virtual void onLeftRightUpdated(int i, int val) = 0; // 
     void onButtonMove(int i, int delta) final;
     void onButtonClick(int i, core::Point mousePos) final;
-
 
     void drawMouse(core::Paint& p, const core::Rect& r) override;
     void drawKeyboard(core::Paint& p, const core::Rect& r) override;

@@ -7,7 +7,6 @@
 #include <windows.h>
 #include <stdint.h>
 
-//TODO REMOVE ME
 #include <iostream>
 
 #include <stdexcept>
@@ -34,11 +33,9 @@ namespace core {
 template<typename... Args>
 std::string concat(Args&&... args) {
     std::stringstream ss;
-    //only works in c++17
     (ss << ... << std::forward<Args>(args));
     return ss.str();
 }
-
 constexpr int clamp(int val, int min, int max) {
     if (val < min) return min;
     else if (val > max) return max;
@@ -72,7 +69,7 @@ inline void warning(const std::string& msg) {
 }
 
 constexpr void constexpr_assert(bool val, const char* msg) {
-    if(!val) throw msg;// //assertion_failed(assert_line<__LINE__>());
+    if(!val) throw msg;
 }
 constexpr void constexpr_assert(bool val) {
     constexpr_assert(val, "Assertion failed");
@@ -154,8 +151,7 @@ struct Point {
 
 struct Rect {
     int left, top, right, bottom;
-//     RECT val;
-// public:
+
     constexpr Rect(): Rect(0,0,0,0) {}
     constexpr Rect(int left, int top, int right, int bottom)
         : left(left), top(top), right(right), bottom(bottom) {}
@@ -269,10 +265,6 @@ public:
     ~WindowDC() noexcept {
         ::ReleaseDC(hwnd, val);
     }
-};
-
-enum class MouseButton {
-    Left, Middle, Right, XButton1, XButton2
 };
 
 } // namespace core

@@ -34,7 +34,8 @@ private:
 
     stockfish::Move toStockfishMove(const FullMove& m);
     FoundMoveCallback foundMoveCallback;
-    //must be static, getDifficulty might get called before this initializes
+
+    // Must be static, getDifficulty might get called before this initializes
     static int difficulty;
     static Bot* instance;
     void doMove(FullMove m);

@@ -7,16 +7,8 @@
 #include <array>
 
 namespace chess {
-//class Piece;
 enum class GameResult {
     Continue, Win, Stalemate, Draw
-    // WinForWhite,
-    // WinForBlack,
-    // StalemateForWhite,
-    // StalemateForBlack,
-    // DrawBy50MoveRule,
-    // DrawByThrefoldRepetition,
-    // DrawByAgreement,
 };
 class BoardState {
 public:
@@ -36,15 +28,14 @@ public:
 
     GameResult testWinOrStalemate(Side s) const;
 
-    //Forsyth-Edwards Notation
+    // Forsyth-Edwards Notation
     std::string getFEN() const;
 
-    //like FEN but don't print the conters
+    // Like FEN but don't print the conters
     std::string getShortenedFEN() const;
 
-    // outputs as FEN
+    // Outputs as FEN
     friend std::ostream& operator<<(std::ostream& s, const BoardState& b);
-    // bool isCheckMate(Side s) const;
 
     constexpr Pos getEnPassantTarget() const {
         return enPassantTarget;
@@ -63,7 +54,7 @@ private:
     // under the fifty-move rule.
     int halfMoveClock = 0;
 
-    // it's just used for the FEN
+    // It's just used for the FEN
     // It starts at 1, and is incremented after Black's move.
     int moveCounter = 1;
     Side currentSide = Side::White;

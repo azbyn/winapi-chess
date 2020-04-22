@@ -14,7 +14,7 @@ void spacedImpl(RectGroup& res, Rect parent, Point size, Point margins) {
     auto mid = parent.middle();
     Point start = IsVert ? Point{mid.x - size.x / 2, margins.y + parent.y0()}
                          : Point{parent.x0() + margins.x, mid.y - size.y / 2};
-    std::cout << "start:" << start << "\n";
+
     for (auto& v: res.val) {
         v = {start, start + size};
         if constexpr (IsVert) {
@@ -59,17 +59,16 @@ void centeredImpl(RectGroup& res, Rect parent, RectGroup::Sizes sizes,
     }
 
     int rectStart = IsVert ? mid.y - (size.y / 2) : mid.x - (size.x / 2);
-    // RectGroup res(sizes.size());
 
     Point boundsSize = size + 2 * margins;
 
     res.boundingRect = Rect::fromMiddleAndSize(mid, boundsSize);
 
-    // initializer_lists don't have random access, so we use iterators
+    // Initializer_lists don't have random access, so we use iterators
     auto spaceIt = spaces.begin();
     auto sizeIt  = sizes.begin();
-    auto it   = res.val.begin();
-    auto last = res.val.end()-1;
+    auto it      = res.val.begin();
+    auto last    = res.val.end() - 1;
 
     for (;; ++spaceIt, ++sizeIt, ++it) {
         auto sz = *sizeIt;
